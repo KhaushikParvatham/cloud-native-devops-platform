@@ -8,22 +8,29 @@ on:
 jobs:
     build:
         runs-on: ubuntu-latest
+        permissions:
+            id-token: write
+            contents: read
 
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
 
-            - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v3
+            - name: Configure AWS credentials (OIDC)
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                  role-to-assume: arn:aws:iam::078551321200:role/github-actions-ecr-role
+                  aws-region: ap-south-1
 
-            - name: Build Docker image (commit tag)
-              run: |
-                  docker build \
-                    -t cloud-native-devops-app:${{ github.sha }} \
-                    -f docker/Dockerfile .
+            - name: Login to Amazon ECR
+              uses: aws-actions/amazon-ecr-login@v2
 
-            - name: Tag Docker image as latest
+            - name: Build and push Docker image
               run: |
-                  docker tag \
-                    cloud-native-devops-app:${{ github.sha }} \
-                    cloud-native-devops-app:latest
+                  IMAGE_URI=078551321200.dkr.ecr.ap-south-1.amazonaws.com/cloud-native-devops-app
+
+                  docker build -t $IMAGE_URI:${{ github.sha }} -f docker/Dockerfile .
+                  docker tag $IMAGE_URI:${{ github.sha }} $IMAGE_URI:latest
+
+                  docker push $IMAGE_URI:${{ github.sha }}
+                  docker push $IMAGE_URI:latest
