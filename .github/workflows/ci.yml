@@ -16,8 +16,14 @@ jobs:
             - name: Set up Docker Buildx
               uses: docker/setup-buildx-action@v3
 
-            - name: Build Docker image
+            - name: Build Docker image (commit tag)
               run: |
                   docker build \
                     -t cloud-native-devops-app:${{ github.sha }} \
                     -f docker/Dockerfile .
+
+            - name: Tag Docker image as latest
+              run: |
+                  docker tag \
+                    cloud-native-devops-app:${{ github.sha }} \
+                    cloud-native-devops-app:latest
