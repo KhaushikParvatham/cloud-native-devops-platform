@@ -127,8 +127,3 @@ This provides **practical zero-downtime deployments** without complex traffic ro
 - Add observability using Prometheus and Grafana
 - Implement blue-green or canary deployment strategies
 - Integrate security scanning into the CI/CD pipeline
-
----
-
-## Repository
-https://github.com/KhaushikParvatham/cloud-native-devops-platform
